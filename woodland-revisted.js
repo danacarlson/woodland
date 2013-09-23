@@ -1,17 +1,18 @@
 (function() { 
   var body = document.getElementsByTagName('body')[0],
   init, stage, tick, numberOfDrops = 5, sun, sunUp = false, children = 0,
-  bgColor, rainColor, rainbow, rainbow1, rainbow2, rainbow3, rainbow4;
+  bgColor, rainColor, rainbow, rainbow1, rainbow2, rainbow3, rainbow4, sign;
   
   init = function() { 
     stage = new createjs.Stage('woodland');  
     setBackgroundColor();
     drawSun();
+    
     drawRainbow();
+    setUpSign(); 
     setBackground();
     createjs.Ticker.addEventListener("tick", tick);
   };
-  
   
   
   initRain = function() { 
@@ -53,12 +54,25 @@
     stage.addChild(bg); 
   };
   
+  setUpSign = function() {
+    sign = new createjs.Bitmap('sign-sm.png');
+    sign.x = 525;
+    sign.y = 700;
+    stage.addChild(sign);
+    sign.onClick = function(e) {
+      initRain();
+      createjs.Tween.get(sign, {loop: false})
+         .to({y: 700}, 2000);
+    };
+  };
+  
   startClearing = function() {
    var interval,
     fade = false;
    interval = setInterval(function() {
-     children = stage.getNumChildren(); 
-     if (children !== 9) {
+     children = stage.getNumChildren();
+      
+     if (children !== 10) {
        if (children <= 200 && fade == false) {
          fade = true;
          //undarken sky 
@@ -70,11 +84,12 @@
              .to({alpha: 1}, 1500);
        }
         
-       for (var i = 9; i< 23; i++) {
+       for (var i = 10; i< 23; i++) {
          stage.removeChildAt(i);
        }
      }
      else {
+       
        clearInterval(interval);
        createjs.Tween.get(rainbow, {loop: false})
            .to({y: -400}, 2000); 
@@ -115,7 +130,7 @@
     sun.alpha = 1;
 
     createjs.Tween.get(sun, {loop: false})
-      .to({y: -600}, 3000).call(function() {
+      .to({y: -600}, 1000).call(function() {
         shrinkSun();
       });
       
@@ -128,8 +143,11 @@
   
   shrinkSun = function() { 
     createjs.Tween.get(sun, {loop:false})
-      .to({scaleX: .85, scaleY: .85}, 1000).call(function() {
-        initRain()});
+      .to({scaleX: .85, scaleY: .85}, 2000).call(function() { 
+        createjs.Tween.get(sign, {loop: false})
+           .to({y: 350}, 2000);
+        //initRain()
+        });
   };
   
   drawRainDrops = function(num) {
